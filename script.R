@@ -160,7 +160,7 @@ demogs_place_2018_cleaner <- function(data) {
 # The Crosswalk file was provided by the US Census Bureau. It creates a relationship
 #   between 2010 and 2020 tracts.
 
-crosswalk <- read.csv("./Data/rr_tract_rel.txt") %>%
+crosswalk <- read.csv("./sources/rr_tract_rel.txt") %>%
   # Add leading spaces for states with FIPS codes that start with 0
   mutate(GEOID10 = sprintf("%011s",as.character(GEOID10)),
          GEOID20 = sprintf("%011s",as.character(GEOID20))) %>%
@@ -376,7 +376,7 @@ msa_list <- get_acs(geography = "metropolitan statistical area/micropolitan stat
   slice_head(n = 20)
 
 ## Import crosswalk file for counties to MSAs (includes supplemental assignment for CMAP area counties)
-county_msa_crosswalk <- read.csv("./Data/County_MSA_Crosswalk.csv") %>%
+county_msa_crosswalk <- read.csv("./sources/County_MSA_Crosswalk.csv") %>%
   # Add leading spaces for states with FIPS codes that start with 0
   mutate(County_GEOID = sprintf("%05s",as.character(County_GEOID))) %>%
   # Replace leading spaces with 0
@@ -476,7 +476,7 @@ filter(race_bucket_MSAs_table, (race == "all" | race == "hispa") & MSA != "all")
 
 ### Export data for mapping and publication ---------------------
 ## Used for maps
-write.csv(final_tract_cmap, file = "./Output/tract_demog_responses_cmap.csv")
+write.csv(final_tract_cmap, file = "./output/tract_demog_responses_cmap.csv")
 
 ## Used for MSA comparison bar chart (formatted)
 
@@ -498,7 +498,7 @@ bar_chart_output <-
          "White Tract Change" = white,
          "No Majority Tract Change" = none)
     
-write.csv(bar_chart_output, file = "./Output/msa_chart_output.csv")
+write.csv(bar_chart_output, file = "./output/msa_chart_output.csv")
 
 # Used for Chicago tract comparison by racial group (formatted)
 chicago_race_output <-
@@ -520,7 +520,7 @@ chicago_race_output <-
          "Tracts in 2010" = n10,
          "Tracts in 2020" = n20)
 
-write.csv(chicago_race_output, file = "./Output/chicago_chart_output.csv")
+write.csv(chicago_race_output, file = "./output/chicago_chart_output.csv")
 
 # Maps rely on 2020 projected geographies, which are available for download here:
 #  https://data.world/uscensusbureau/2020-census-response-rates/workspace
