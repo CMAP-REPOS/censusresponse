@@ -7,7 +7,7 @@
 ## get 2020 and 2010 rates for cities and towns (ALL IN ILLINOIS - State 17)
 
 # Load list of places in the CMAP area
-cmap_places <- read.csv("./Data/CMAP_MPA_Places.csv")
+cmap_places <- read.csv("./sources/CMAP_MPA_Places.csv")
 
 # Pull data and filter for places in the CMAP area
 response_place <- full_join(
@@ -361,7 +361,7 @@ final_tract <- full_join(interpolated_tract_combined,
 final_place <- left_join(response_place,demogs_place_2018_clean,by = c("GEOID","NAME"))
 
 # Export place data
-write.csv(final_place, file = "./Output/place_demog_responses.csv")
+write.csv(final_place, file = "./output/place_demog_responses.csv")
 
 
 
@@ -381,7 +381,7 @@ min(colSums(truth_check,na.rm = TRUE)) == nrow(truth_check)
 #   and rolls up a regional average using county-only rates vs. tract-level rates))
 
 
-data_as_of_819 <- read.csv("./data/08-19-2020RRData.csv")
+data_as_of_819 <- read.csv("./sources/08-19-2020RRData.csv")
 
 counties_as_of_819 <- data_as_of_819 %>%
   rename(GEO_ID = ï..GEO_ID) %>%
