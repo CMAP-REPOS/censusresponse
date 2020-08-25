@@ -256,16 +256,13 @@ demogs_tract_USA_2018_clean <- demogs_tract_2018_cleaner(demogs_tract_USA_2018)
 
 # Create crosswalk file with relevant variables
 crosswalkUSA <- crosswalk %>%
-  select(GEOID10, 
-         GEOID20,
-         # These variables represent the share of 2010 housing represented in
-         #   the 2010 and 2020 tracts, respectively.
-         HU10PCT_T10,
-         HU10PCT_T20,
-         # These variables represent the share of current housing represented in
-         #   the 2010 and 2020 tracts, respectively
-         HUCURPCT_T10,
-         HUCURPCT_T20)
+  select(GEOID10,          # The tract ID for the 2010 tract of the record
+         GEOID20,          # The tract ID for the 2020 tract of the record
+         HU10PCT_T10,      # Percentage of 2010 housing units associated with the 2010-based tract represented by the record
+         HU10PCT_T20,      # Percentage of 2020 housing units associated with the 2010-based tract represented by the record
+         HUCURPCT_T10,     # Percentage of current estimated housing units associated with the 2010-based tract represented by the record
+         HUCURPCT_T20)     # Percentage of current estimated housing units associated with the 2020-based tract represented by the record
+
 
 
 ## Interpolate 2010 and 2018 data to 2020 tracts.
