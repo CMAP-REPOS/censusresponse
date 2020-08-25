@@ -2,7 +2,7 @@
 ####  but potentially useful for interested third parties
 
 
-###  NOTE - this code relies on functions and packages defined and loaded in script.R
+###  NOTE - this code relies on functions, packages, and tables defined and loaded in script.R
 
 ## get 2020 and 2010 rates for cities and towns (ALL IN ILLINOIS - State 17)
 
@@ -380,9 +380,10 @@ min(colSums(truth_check,na.rm = TRUE)) == nrow(truth_check)
 #   county-wide (and more recent) household totals from the ACS 1 year estimates,
 #   and rolls up a regional average using county-only rates vs. tract-level rates))
 
-
+# Load data as of 8/19 (downloaded from Census page on data.world)
 data_as_of_819 <- read.csv("./sources/08-19-2020RRData.csv")
 
+# Filter county-level self-responses in the seven county area
 counties_as_of_819 <- data_as_of_819 %>%
   rename(GEO_ID = ï..GEO_ID) %>%
   filter(grepl("0500000US",GEO_ID)) %>%
@@ -393,6 +394,7 @@ counties_as_of_819 <- data_as_of_819 %>%
          county,
          CRRALL)
 
+# Pull current county-level self-responses in the seven county area
 response_region <- full_join(
   getCensus(name = "dec/responserate",
             vintage = "2020",
@@ -407,6 +409,7 @@ response_region <- full_join(
   by = c("GEO_ID","state","county","NAME")) %>%
   filter(county %in% cmap_counties)
 
+# Pull demographic information on the seven county area
 demogs_region_2018 <- get_acs(geography = "county", variables = "B25001_001", 
                               cache_table = TRUE, year = 2018, state = "17", 
                               survey = "acs1", output = "wide") %>%
@@ -423,14 +426,17 @@ demogs_region_2010 <- get_acs(geography = "county", variables = "B25001_001",
          NAME,
          hunit10 = B25001_001E)
 
+# Combine 2010 and 2018 demographic information for the seven county area
 hunit_region <- full_join(demogs_region_2010,demogs_region_2018,by=c("GEOID","NAME")) %>%
   separate(GEOID, into = c("state", "county"),
            sep = c(2), remove = FALSE) %>%
   select(state,county,NAME,hunit10,hunit18)
 
+# Combine self-response and demographic information for the seven county area
 final_region <- full_join(hunit_region,response_region,by=c("state","county","NAME")) %>%
   mutate(CRRALL = as.numeric(CRRALL),
          FSRR2010 = as.numeric(FSRR2010)) %>%
+  # Add sums of housing units from tract-level data for comparison
   cbind(.,demogs_tract_2018_clean %>% group_by(county) %>% summarize(sum = sum(hunit)) %>% select(hunit18alt = sum)) %>%
   cbind(.,demogs_tract_2010_clean %>% group_by(county) %>% summarize(sum = sum(hunit)) %>% select(hunit10alt = sum)) %>%
   cbind(.,counties_as_of_819 %>% select(CRRALL0819 = CRRALL))
