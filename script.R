@@ -1,7 +1,7 @@
 ### Loading Packages and APIs  --------------------
 
 
-#install.packages("tidyverse")
+# install.packages("tidyverse")
 # install.packages("censusapi")
 # install.packages("tidycensus")
 
@@ -12,6 +12,7 @@ library(tidycensus)
 
 ### Loading Census API Key ----------
 
+# You can get your own census API key here: https://api.census.gov/data/key_signup.html
 # Add your own census API key to CURRENT .Renviron for getCensus
 Sys.setenv(CENSUS_KEY="YOUR KEY HERE")
 readRenviron("./.Renviron")
@@ -25,17 +26,6 @@ census_api_key("YOUR KEY HERE")
 
 # CMAP area, county FIPS codes
 cmap_counties <- c("031", "043", "089", "093", "097", "111", "197")
-
-### Download response rate data ------------------------
-
-# Variables:  NAME: City/town/locality name
-#             GEO_ID: Combined codes for the reference geography
-#             CRRALL: Cumulative Self-Response Rate - Overall
-#             CRRINT: Cumulative Self-Response Rate - Internet
-#             RESP_DATE: Most recent data cutoff for responses received, 
-#                          point in time response rates are calculated for
-#             PLACE: Place
-#             FSRR2010: Final Self Response Rate 2010
 
 ### download demographic info ---------------------
 
@@ -173,6 +163,16 @@ crosswalk <- read.csv("./sources/rr_tract_rel.txt") %>%
 ########################### Full USA Data #####################################
 
 
+### Download response rate data ------------------------
+
+# Variables:  NAME: City/town/locality name
+#             GEO_ID: Combined codes for the reference geography
+#             CRRALL: Cumulative Self-Response Rate - Overall
+#             CRRINT: Cumulative Self-Response Rate - Internet
+#             RESP_DATE: Most recent data cutoff for responses received, 
+#                          point in time response rates are calculated for
+#             FSRR2010: Final Self Response Rate 2010
+
 ## Pull data for all tracts in the US
 
 # Empty data frame
@@ -256,12 +256,14 @@ demogs_tract_USA_2018_clean <- demogs_tract_2018_cleaner(demogs_tract_USA_2018)
 
 # Create crosswalk file with relevant variables
 crosswalkUSA <- crosswalk %>%
-  # These variables represent the share of 2010 housing represented in
-  #   the 2010 and 2020 tracts, respectively.
   select(GEOID10, 
          GEOID20,
+         # These variables represent the share of 2010 housing represented in
+         #   the 2010 and 2020 tracts, respectively.
          HU10PCT_T10,
          HU10PCT_T20,
+         # These variables represent the share of current housing represented in
+         #   the 2010 and 2020 tracts, respectively
          HUCURPCT_T10,
          HUCURPCT_T20)
 
@@ -361,7 +363,7 @@ final_tract_USA <- full_join(interpolated_tract_USA,
 
 ## Pull list of top 20 MSAs by population
 msa_list <- get_acs(geography = "metropolitan statistical area/micropolitan statistical area", 
-                    variables = c("B01001_001"), 
+                    variables = c("B01001_001"), # population
                     cache_table = TRUE, 
                     year = 2018,
                     survey = "acs5",
@@ -415,7 +417,7 @@ race_bucket_MSAs_2010 <- final_tract_MSAs %>%
   bind_rows(mutate(.,MSA = "all")) %>%
   group_by(race_maj10,MSA) %>%
   
-  # Calculate mean participation rate, weighted by households in 2010
+  # Calculate mean participation rate, weighted by housing units in 2010
   summarize(mean10 = weighted.mean(FSRR2010,w=hunit10),
             n = n())
 
@@ -465,8 +467,7 @@ filter(race_bucket_MSAs_table, (race == "all" | race == "hispa") & MSA != "all")
   mutate(
   legend = case_when(
     race == "all" ~ "Overall Difference",
-    race == "hispa" ~ "Difference in Majority-Hispanic Tracts",
-    race == "black" ~ "Difference in Majority-Black Tracts"
+    race == "hispa" ~ "Difference in Majority-Hispanic Tracts"
   )) %>%
   filter(!is.na(difference)) %>%
   ggplot(aes(fill=legend, y=difference, x=MSA)) +
@@ -482,10 +483,7 @@ write.csv(final_tract_cmap, file = "./output/tract_demog_responses_cmap.csv")
 
 bar_chart_output <-
   filter(race_bucket_MSAs_table, (race == "all" | 
-                                    race == "hispa" | 
-                                    race == "black" | 
-                                    race == "white" | 
-                                    race == "none") & 
+                                  race == "hispa") & 
            MSA != "all" &
            MSA != "CMAP Region") %>%
   mutate(difference = difference/100) %>%
@@ -493,10 +491,7 @@ bar_chart_output <-
   arrange(all) %>%
   select(MSA,
          "Overall Change" = all,
-         "Black Tract Change" = black,
-         "Hispanic Tract Change" = hispa,
-         "White Tract Change" = white,
-         "No Majority Tract Change" = none)
+         "Hispanic Tract Change" = hispa)
     
 write.csv(bar_chart_output, file = "./output/msa_chart_output.csv")
 
