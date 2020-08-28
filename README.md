@@ -1,6 +1,6 @@
 # Analysis of 2020 census self-response rates in the CMAP region
 
-This repo contains code used in the production of an upcoming policy update, which analyzes current self-response rates to the U.S. Census in northeastern Illinois.
+This repo contains code used in the production of a [policy update](https://www.cmap.illinois.gov/updates/all/-/asset_publisher/UIMfSLnFfMB6/content/illinois-at-risk-of-a-census-undercount-especially-in-communities-of-color), which analyzes current self-response rates to the U.S. Census in northeastern Illinois.
 
 The [script](script.R) was developed and run in the open-source programming language R. CMAP analyzed tract-level, self-response data for both the 2010 and 2020 census, and relied on the following sources:
 - 2020 self-response rates from the U.S. Census Bureau, which were pulled directly via the Census Bureau's API (note that this data does not include any responses gathered by the Census Bureau’ enumerators: the staff who visit households that have not yet responded online or by mail). For reference, current self-response data is also presented in visual form by the Census Bureau, [here](https://2020census.gov/en/response-rates.html).
