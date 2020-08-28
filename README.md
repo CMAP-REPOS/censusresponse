@@ -1,4 +1,4 @@
-# Analysis of 2020 census self-response rates in CMAP region
+# Analysis of 2020 census self-response rates in the CMAP region
 
 This repo contains code used in the production of an upcoming policy update, which analyzes current self-response rates to the U.S. Census in northeastern Illinois.
 
